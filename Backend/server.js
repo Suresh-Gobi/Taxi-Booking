@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const locationRoutes = require("./Routes/Location.routes");
 const passengerRoutes = require("./Routes/Passenger.route");
+const driverRoutes = require("./Routes/Driver.routes");
 
 const app = express();
 app.use(cors({ origin: '*' })); 
@@ -34,6 +35,7 @@ app.use(bodyParser.json());
 // Use routes
 app.use("/api/location", locationRoutes);
 app.use("/api/passenger", passengerRoutes);
+app.use("/api/driver", driverRoutes);
 
 // Set up Socket.io connection
 io.on("connection", (socket) => {
