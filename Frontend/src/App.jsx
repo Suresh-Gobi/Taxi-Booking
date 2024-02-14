@@ -6,6 +6,8 @@ import "./App.css";
 import Location from "./Components/Location/Location";
 import DriverLocation from "./Components/Driver/Location/DriverLocation";
 import DriverLogin from "./Components/Driver/Login/DriverLogin";
+import Signup from "./Components/Passenger/Signup/Signup";
+import Login from "./Components/Passenger/Login/Login";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -15,9 +17,11 @@ function App() {
       
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Location />} />\
+          <Route path="/location" element={<Location />} />\
           <Route path="/driverlocation" element={<DriverLocation />} />
           <Route path="/driverlogin" element={<DriverLogin />} />
+          <Route path="/passengersignup" element={<Signup />} />
+          <Route path="/passengerlogin" element={<Login />} />
         </Routes>
       </BrowserRouter>
     </>

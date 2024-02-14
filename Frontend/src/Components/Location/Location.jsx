@@ -14,6 +14,59 @@ const LocationComponent = () => {
   const [nearbyDrivers, setNearbyDrivers] = useState([]); // State variable to hold nearby drivers
   const [destinationLatitude, setDestinationLatitude] = useState(null);
   const [destinationLongitude, setDestinationLongitude] = useState(null);
+  const [passengerId, setPassengerId] = useState(null);
+
+  // Modify the book now, with post the API with get passenger details by decoding the token which was saved in the local storage.
+
+  useEffect(() => {
+    // Other code remains the same
+  }, [map, currentLocationClicked]);
+
+  // Function to decode JWT token
+  const decodeToken = (token) => {
+    return JSON.parse(atob(token.split(".")[1]));
+  };
+
+  const handleBookNow = async (driverId) => {
+    try {
+      // Retrieve token from local storage
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token not found in local storage");
+      }
+
+      // Create config object with Authorization header
+      const passengerId = decodeToken(token).id;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      // Send booking details to the backend API with the config
+      const response = await axios.post(
+        "http://localhost:5000/api/booking/book",
+        {
+          distance,
+          price,
+          pickupLocation: {
+            latitude: location.latitude,
+            longitude: location.longitude,
+          },
+          dropLocation: {
+            latitude: destinationLatitude,
+            longitude: destinationLongitude,
+          },
+          passengerId,
+          driverId,
+        },
+        config
+      );
+      console.log("Booking created:", response.data);
+    } catch (error) {
+      console.error("Error creating booking:", error);
+    }
+  };
 
   useEffect(() => {
     // Get user's initial location automatically
@@ -195,12 +248,13 @@ const LocationComponent = () => {
         <h3>Nearby Drivers</h3>
         {nearbyDrivers.map((driver) => (
           <div key={driver._id}>
+            <p>Driver ID: {driver._id}</p>
             <p>Driver: {driver.username}</p>
             <p>Email: {driver.email}</p>
             <p>Status: {driver.available}</p>
             <p>Latitude: {driver.latitude}</p>
             <p>Longitude: {driver.longitude}</p>
-            <button>Book Now</button>
+            <button onClick={() => handleBookNow(driver._id)}>Book Now</button>
           </div>
         ))}
       </div>
