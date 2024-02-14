@@ -9,8 +9,11 @@ const LocationComponent = () => {
   const [map, setMap] = useState(null);
   const [destination, setDestination] = useState("");
   const [currentLocationClicked, setCurrentLocationClicked] = useState(false);
-  const [distance, setDistance] = useState(null); // State variable to hold the distance
+  const [distance, setDistance] = useState(null);
+  const [price, setPrice] = useState(null);
   const [nearbyDrivers, setNearbyDrivers] = useState([]); // State variable to hold nearby drivers
+  const [destinationLatitude, setDestinationLatitude] = useState(null);
+  const [destinationLongitude, setDestinationLongitude] = useState(null);
 
   useEffect(() => {
     // Get user's initial location automatically
@@ -105,7 +108,14 @@ const LocationComponent = () => {
               totalDistance += route.legs[i].distance.value;
             }
             const distanceInKm = totalDistance / 1000; // Convert meters to kilometers
-            setDistance(distanceInKm.toFixed(2)); // Update distance state
+            setDistance(distanceInKm.toFixed(2));
+            // Calculate price based on distance
+            const calculatedPrice = calculatePrice(distanceInKm);
+            setPrice(calculatedPrice);
+            // Extract and set destination latitude and longitude
+            const destinationLocation = route.legs[0].end_location;
+            setDestinationLatitude(destinationLocation.lat());
+            setDestinationLongitude(destinationLocation.lng());
           } else {
             console.error("Directions request failed due to " + status);
           }
@@ -131,6 +141,25 @@ const LocationComponent = () => {
     }
   };
 
+  // Function to calculate price based on distance
+  const calculatePrice = (distanceInKm) => {
+    let price = 0;
+    if (distanceInKm > 0 && distanceInKm <= 100) {
+      price = 50;
+    } else if (distanceInKm > 100 && distanceInKm <= 200) {
+      price = 100;
+    } else if (distanceInKm > 200 && distanceInKm <= 300) {
+      price = 150;
+    } else if (distanceInKm > 300 && distanceInKm <= 400) {
+      price = 200;
+    } else if (distanceInKm > 400 && distanceInKm <= 500) {
+      price = 250;
+    } else if (distanceInKm > 500) {
+      price = 300;
+    }
+    return price;
+  };
+
   return (
     <div>
       <div id="map" style={{ width: "100%", height: "400px" }}></div>
@@ -154,7 +183,13 @@ const LocationComponent = () => {
 
       {/* Display the distance in kilometers */}
       {distance && <p>Distance: {distance} km</p>}
-
+      {price && <p>Fixed Price: {price} /=</p>}
+      {destinationLatitude && destinationLongitude && (
+        <p>
+          Destination Latitude: {destinationLatitude}, Destination Longitude:{" "}
+          {destinationLongitude}
+        </p>
+      )}
       {/* Display nearby drivers */}
       <div>
         <h3>Nearby Drivers</h3>
@@ -163,8 +198,9 @@ const LocationComponent = () => {
             <p>Driver: {driver.username}</p>
             <p>Email: {driver.email}</p>
             <p>Status: {driver.available}</p>
-            <p>Status: {driver.latitude}</p>
-            <p>Status: {driver.longitude}</p>
+            <p>Latitude: {driver.latitude}</p>
+            <p>Longitude: {driver.longitude}</p>
+            <button>Book Now</button>
           </div>
         ))}
       </div>
