@@ -14,7 +14,6 @@ const LocationComponent = () => {
   const [nearbyDrivers, setNearbyDrivers] = useState([]); // State variable to hold nearby drivers
   const [destinationLatitude, setDestinationLatitude] = useState(null);
   const [destinationLongitude, setDestinationLongitude] = useState(null);
-  const [passengerId, setPassengerId] = useState(null);
 
   // Modify the book now, with post the API with get passenger details by decoding the token which was saved in the local storage.
 
@@ -23,50 +22,57 @@ const LocationComponent = () => {
   }, [map, currentLocationClicked]);
 
   // Function to decode JWT token
-  const decodeToken = (token) => {
-    return JSON.parse(atob(token.split(".")[1]));
-  };
+const decodeToken = (token) => {
+  return JSON.parse(atob(token.split(".")[1]));
+};
 
-  const handleBookNow = async (driverId) => {
-    try {
-      // Retrieve token from local storage
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Token not found in local storage");
-      }
-
-      // Create config object with Authorization header
-      const passengerId = decodeToken(token).id;
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      // Send booking details to the backend API with the config
-      const response = await axios.post(
-        "http://localhost:5000/api/booking/book",
-        {
-          distance,
-          price,
-          pickupLocation: {
-            latitude: location.latitude,
-            longitude: location.longitude,
-          },
-          dropLocation: {
-            latitude: destinationLatitude,
-            longitude: destinationLongitude,
-          },
-          passengerId,
-          driverId,
-        },
-        config
-      );
-      console.log("Booking created:", response.data);
-    } catch (error) {
-      console.error("Error creating booking:", error);
+const handleBookNow = async (driverId) => {
+  try {
+    // Retrieve token from local storage
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token not found in local storage");
     }
-  };
+
+    // Decode token to extract passenger ID
+    const passengerId = decodeToken(token).id;
+
+    // Create config object with Authorization header
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    // Send booking details to the backend API
+    const response = await axios.post(
+      "http://localhost:5000/api/booking/book",
+      {
+        distance,
+        price,
+        pickupLocation: {
+          coordinates: [location.longitude, location.latitude],
+        },
+        dropLocation: {
+          coordinates: [destinationLongitude, destinationLatitude],
+        },
+        driverId,
+        passengerId,
+      },
+      config
+    );
+
+    // Handle successful booking response
+    console.log("Booking created:", response.data);
+    // You can perform additional actions here, such as updating the UI or showing a success message.
+  } catch (error) {
+    // Handle booking error
+    console.error("Error creating booking:", error.message);
+    // You can display an error message to the user or perform other error handling actions.
+  }
+};
+
+  
 
   useEffect(() => {
     // Get user's initial location automatically

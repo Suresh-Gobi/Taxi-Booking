@@ -37,18 +37,24 @@ const bookingSchema = new mongoose.Schema({
     default: "pending",
   },
   passenger: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Passenger",
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Passenger",
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
   },
   driver: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Driver",
   },
 });
-
-// Indexes for geospatial queries
-bookingSchema.index({ pickupLocation: "2dsphere" });
-bookingSchema.index({ dropLocation: "2dsphere" });
 
 const Booking = mongoose.model("Booking", bookingSchema);
 
