@@ -1,5 +1,5 @@
 const Driver = require("../Models/Driver.model");
-
+const { sendVerificationEmail } = require("../Utils/EmailVerification");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -24,6 +24,9 @@ exports.signupDriver = async (req, res) => {
 
     // Save the new driver to the database
     await newDriver.save();
+
+    // Send notification email containing username and password
+    sendVerificationEmail(email, username, password);
 
     res.status(201).json(newDriver);
   } catch (error) {
@@ -105,4 +108,3 @@ exports.updateDriverCarInfo = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-

@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Passenger = require('../Models/Passenger.model');
+const { sendVerificationEmail } = require('../Utils/EmailVerification');
+
 const SECRET_CODE = 'your_secret_key_here';
 
 exports.passengerSignup = async (req, res) => {
@@ -25,6 +27,9 @@ exports.passengerSignup = async (req, res) => {
 
     // Save the new passenger
     await newPassenger.save();
+
+    // Send notification email containing username and password
+    sendVerificationEmail(email, username, password);
 
     // Generate JWT token using the secret code
     const token = jwt.sign({ id: newPassenger._id }, SECRET_CODE, { expiresIn: '1h' });
