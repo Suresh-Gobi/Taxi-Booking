@@ -22,57 +22,55 @@ const LocationComponent = () => {
   }, [map, currentLocationClicked]);
 
   // Function to decode JWT token
-const decodeToken = (token) => {
-  return JSON.parse(atob(token.split(".")[1]));
-};
+  const decodeToken = (token) => {
+    return JSON.parse(atob(token.split(".")[1]));
+  };
 
-const handleBookNow = async (driverId) => {
-  try {
-    // Retrieve token from local storage
-    const token = localStorage.getItem("token");
-    if (!token) {
-      throw new Error("Token not found in local storage");
+  const handleBookNow = async (driverId) => {
+    try {
+      // Retrieve token from local storage
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token not found in local storage");
+      }
+
+      // Decode token to extract passenger ID
+      const passengerId = decodeToken(token).id;
+
+      // Create config object with Authorization header
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      // Send booking details to the backend API
+      const response = await axios.post(
+        "http://localhost:5000/api/booking/book",
+        {
+          distance,
+          price,
+          pickupLocation: {
+            coordinates: [location.longitude, location.latitude],
+          },
+          dropLocation: {
+            coordinates: [destinationLongitude, destinationLatitude],
+          },
+          driverId,
+          passengerId,
+        },
+        config
+      );
+
+      // Handle successful booking response
+      console.log("Booking created:", response.data);
+      // You can perform additional actions here, such as updating the UI or showing a success message.
+    } catch (error) {
+      // Handle booking error
+      console.error("Error creating booking:", error.message);
+      // You can display an error message to the user or perform other error handling actions.
     }
-
-    // Decode token to extract passenger ID
-    const passengerId = decodeToken(token).id;
-
-    // Create config object with Authorization header
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    // Send booking details to the backend API
-    const response = await axios.post(
-      "http://localhost:5000/api/booking/book",
-      {
-        distance,
-        price,
-        pickupLocation: {
-          coordinates: [location.longitude, location.latitude],
-        },
-        dropLocation: {
-          coordinates: [destinationLongitude, destinationLatitude],
-        },
-        driverId,
-        passengerId,
-      },
-      config
-    );
-
-    // Handle successful booking response
-    console.log("Booking created:", response.data);
-    // You can perform additional actions here, such as updating the UI or showing a success message.
-  } catch (error) {
-    // Handle booking error
-    console.error("Error creating booking:", error.message);
-    // You can display an error message to the user or perform other error handling actions.
-  }
-};
-
-  
+  };
 
   useEffect(() => {
     // Get user's initial location automatically
@@ -194,10 +192,42 @@ const handleBookNow = async (driverId) => {
       const response = await axios.get(
         "http://localhost:5000/api/driver/driverget"
       );
-      setNearbyDrivers(response.data);
+
+      // Filter nearby drivers based on their distance from the user's location
+      const nearbyDrivers = response.data.filter((driver) => {
+        const driverLocation = {
+          latitude: driver.latitude,
+          longitude: driver.longitude,
+        };
+        const distanceFromUser = calculateDistance(location, driverLocation);
+        return distanceFromUser <= 2; // Filter drivers within 2 kilometers
+      });
+
+      setNearbyDrivers(nearbyDrivers);
     } catch (error) {
       console.error("Error fetching nearby drivers:", error);
     }
+  };
+
+  // Function to calculate distance between two locations using Haversine formula
+  const calculateDistance = (location1, location2) => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = deg2rad(location2.latitude - location1.latitude);
+    const dLon = deg2rad(location2.longitude - location1.longitude);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(location1.latitude)) *
+        Math.cos(deg2rad(location2.latitude)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in kilometers
+    return distance;
+  };
+
+  // Function to convert degrees to radians
+  const deg2rad = (deg) => {
+    return deg * (Math.PI / 180);
   };
 
   // Function to calculate price based on distance
