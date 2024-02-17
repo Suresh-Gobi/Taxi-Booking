@@ -1,3 +1,4 @@
+// Import useState and useEffect from React
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -39,15 +40,36 @@ export default function Bookings() {
     fetchBookings();
   }, []); // Empty dependency array ensures useEffect runs only once after the initial render
 
-  // Function to handle accepting a booking
-  const handleAcceptBooking = async (bookingId) => {
+  // Function to handle completing a booking
+  const handleCompleteBooking = async (bookingId, index) => {
     try {
-      // Make a POST request to your backend endpoint to accept the booking
-      // You need to implement the logic in your backend to handle accepting bookings
-      // You can pass the bookingId as a parameter to your backend API
+      // Make a POST request to your backend endpoint to complete the booking
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token not found in local storage");
+      }
+
+      // Create config object with Authorization header
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      // Make a POST request to update the booking status to "complete"
+      await axios.put(
+        "http://localhost:5000/api/booking/completebooking",
+        { bookingId },
+        config
+      );
+
+      // Update the status of the booking in the local state
+      const updatedBookings = [...bookings];
+      updatedBookings[index].status = "completed";
+      setBookings(updatedBookings);
     } catch (error) {
       // Handle error
-      console.error("Error accepting booking:", error);
+      console.error("Error completing booking:", error);
     }
   };
 
@@ -72,10 +94,17 @@ export default function Bookings() {
               Drop Location: Latitude - {booking.dropLocation.coordinates[1]},
               Longitude - {booking.dropLocation.coordinates[0]}
             </p>
-            {/* Add accept button */}
-            {booking.status === "pending" && (
-              <button onClick={() => handleAcceptBooking(booking._id)}>
+            {/* Conditional rendering for accept or complete button */}
+            {booking.status === "pending" ? (
+              <button onClick={() => handleAcceptBooking(booking._id, index)}>
                 Accept
+              </button>
+            ) : (
+              <button
+                onClick={() => handleCompleteBooking(booking._id, index)}
+                disabled={booking.status === "completed"}
+              >
+                Complete
               </button>
             )}
           </li>

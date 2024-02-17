@@ -1,4 +1,5 @@
 const Booking = require('../Models/Booking.model');
+const Driver = require('../Models/Driver.model');
 const Passenger = require('../Models/Passenger.model');
 const jwt = require('jsonwebtoken');
 
@@ -72,5 +73,89 @@ exports.showBooking = async (req, res) => {
 
 /*write me backend function for that driver can accepted the 
 booking, and in the bookings the status should be updated to accepted. and in driver their available should be updated as false. extract the token to get driver details.*/
+exports.acceptBooking = async (req, res) => {
+  try {
+    // Get the token from the request headers
+    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
 
-/* And accpeting the  */
+    // Verify the token using the secret key
+    const decodedToken = jwt.verify(token, secretKey);
+
+    // Extract driver ID from the decoded token
+    const driverId = decodedToken.id;
+
+    // Check if the required parameters are present in the request body
+    const { bookingId } = req.body;
+    if (!bookingId) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    // Find the booking by ID
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    // Check if the booking is already accepted or completed
+    if (booking.status !== 'pending') {
+      return res.status(400).json({ error: 'Booking is not pending' });
+    }
+
+    // Update the booking status to "accepted"
+    booking.status = 'accepted';
+    await booking.save();
+
+    // Update the driver's availability to false
+    const driver = await Driver.findByIdAndUpdate(driverId, { available: false }, { new: true });
+
+    // Respond with success message
+    res.status(200).json({ message: 'Booking accepted successfully', booking });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.completeBooking = async (req, res) => {
+  try {
+    // Get the token from the request headers
+    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
+
+    // Verify the token using the secret key
+    const decodedToken = jwt.verify(token, secretKey);
+
+    // Extract driver ID from the decoded token
+    const driverId = decodedToken.id;
+
+    // Check if the required parameters are present in the request body
+    const { bookingId } = req.body;
+    if (!bookingId) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    // Find the booking by ID
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    // Check if the booking is already completed
+    if (booking.status === 'completed') {
+      return res.status(400).json({ error: 'Booking is already completed' });
+    }
+
+    // Update the booking status to "completed"
+    booking.status = 'completed';
+    await booking.save();
+
+    // Respond with success message
+    res.status(200).json({ message: 'Booking completed successfully', booking });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    res.status(500).json({ error: error.message });
+  }
+};
