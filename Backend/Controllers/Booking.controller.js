@@ -2,11 +2,10 @@ const Booking = require('../Models/Booking.model');
 const Passenger = require('../Models/Passenger.model');
 const jwt = require('jsonwebtoken');
 
+const secretKey = 'your_secret_key_here';
+
 exports.createBooking = async (req, res) => {
   try {
-    // Define the secret key
-    const secretKey = 'your_secret_key_here';
-
     // Get the token from the request headers
     const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
 
@@ -14,11 +13,11 @@ exports.createBooking = async (req, res) => {
     const decodedToken = jwt.verify(token, secretKey);
 
     // Extract passenger ID from the decoded token
-    const passengerId = decodedToken.passengerId;
+    const passengerId = decodedToken.id;
 
     // Check if the required parameters are present in the request body
-    const { distance, price, pickupLocation, dropLocation, driverId } = req.body;
-    if (!distance || !price || !pickupLocation || !dropLocation || !driverId) {
+    const { distance, price, pickupLocation, dropLocation, driverId, passenger } = req.body;
+    if (!distance || !price || !pickupLocation || !dropLocation || !driverId || !passenger) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
 
@@ -28,15 +27,19 @@ exports.createBooking = async (req, res) => {
       price,
       pickupLocation,
       dropLocation,
-      passenger: passengerId, // Assign the passenger ID to the booking
+      passenger: {
+        _id: passenger.id,
+        email: passenger.email,
+        username: passenger.username,
+      },
       driver: driverId, // Assign the selected driver ID to the booking
     });
 
     // Save the booking to the database
     const savedBooking = await newBooking.save();
 
-    // Respond with the created booking
-    res.status(201).json({ booking: savedBooking, passenger: decodedToken });
+    // Respond with the created booking and passenger details
+    res.status(201).json({ booking: savedBooking, passenger });
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expired' });
@@ -44,6 +47,8 @@ exports.createBooking = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 // show bookings related to logged in drivers (extract driver details from token)
 exports.showBooking = async (req, res) => {

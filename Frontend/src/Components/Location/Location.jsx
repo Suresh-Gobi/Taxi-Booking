@@ -45,17 +45,17 @@ const LocationComponent = () => {
       if (!token) {
         throw new Error("Token not found in local storage");
       }
-
-      // Decode token to extract passenger ID
-      const passengerId = decodeToken(token).id;
-
+  
+      // Decode token to extract passenger details
+      const { id: passengerId, email, username } = decodeToken(token);
+  
       // Create config object with Authorization header
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       };
-
+  
       // Send booking details to the backend API
       const response = await axios.post(
         "http://localhost:5000/api/booking/book",
@@ -69,11 +69,15 @@ const LocationComponent = () => {
             coordinates: [destinationLongitude, destinationLatitude],
           },
           driverId,
-          passengerId,
+          passenger: {
+            id: passengerId,
+            email,
+            username,
+          },
         },
         config
       );
-
+  
       // Handle successful booking response
       console.log("Booking created:", response.data);
       // You can perform additional actions here, such as updating the UI or showing a success message.
@@ -83,6 +87,7 @@ const LocationComponent = () => {
       // You can display an error message to the user or perform other error handling actions.
     }
   };
+  
 
   useEffect(() => {
     // Get user's initial location automatically
