@@ -14,8 +14,7 @@ const LocationComponent = () => {
   const [nearbyDrivers, setNearbyDrivers] = useState([]); // State variable to hold nearby drivers
   const [destinationLatitude, setDestinationLatitude] = useState(null);
   const [destinationLongitude, setDestinationLongitude] = useState(null);
-
-  // Modify the book now, with post the API with get passenger details by decoding the token which was saved in the local storage.
+  const [loggedInUserData, setLoggedInUserData] = useState(null);
 
   useEffect(() => {
     // Other code remains the same
@@ -25,6 +24,18 @@ const LocationComponent = () => {
   const decodeToken = (token) => {
     return JSON.parse(atob(token.split(".")[1]));
   };
+
+  const extractUserDataFromToken = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const { username, id } = decodeToken(token);
+      setLoggedInUserData({ username, id });
+    }
+  };
+  // Call the function to extract user data from token
+  useEffect(() => {
+    extractUserDataFromToken();
+  }, []);
 
   const handleBookNow = async (driverId) => {
     try {
@@ -251,6 +262,14 @@ const LocationComponent = () => {
 
   return (
     <div>
+      {/* Display logged-in user data */}
+      {loggedInUserData && (
+        <div>
+          <h3>Logged In User Data</h3>
+          <p>Username: {loggedInUserData.username}</p>
+          <p>ID: {loggedInUserData.id}</p>
+        </div>
+      )}
       <div id="map" style={{ width: "100%", height: "400px" }}></div>
       <div>
         <button onClick={handleCurrentLocationClick}>
