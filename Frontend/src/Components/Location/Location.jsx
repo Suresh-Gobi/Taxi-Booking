@@ -28,10 +28,11 @@ const LocationComponent = () => {
   const extractUserDataFromToken = () => {
     const token = localStorage.getItem("token");
     if (token) {
-      const { username, id } = decodeToken(token);
-      setLoggedInUserData({ username, id });
+      const { username, id, email } = decodeToken(token);
+      setLoggedInUserData({ username, id, email });
     }
   };
+  
   // Call the function to extract user data from token
   useEffect(() => {
     extractUserDataFromToken();
@@ -267,6 +268,7 @@ const LocationComponent = () => {
         <div>
           <h3>Logged In User Data</h3>
           <p>Username: {loggedInUserData.username}</p>
+          <p>email: {loggedInUserData.email}</p>
           <p>ID: {loggedInUserData.id}</p>
         </div>
       )}

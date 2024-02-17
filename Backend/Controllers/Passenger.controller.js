@@ -52,8 +52,13 @@ exports.passengerLogin = async (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    // Generate JWT token using the secret code
-    const token = jwt.sign({ id: passenger._id }, SECRET_CODE, { expiresIn: '1h' });
+    // Generate JWT token including passenger's ID, username, and email
+    const tokenPayload = {
+      id: passenger._id,
+      username: passenger.username,
+      email: passenger.email
+    };
+    const token = jwt.sign(tokenPayload, SECRET_CODE, { expiresIn: '1h' });
 
     // Respond with success and token
     res.status(200).json({ message: 'Passenger logged in successfully', token });
