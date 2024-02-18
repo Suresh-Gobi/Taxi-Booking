@@ -217,7 +217,7 @@ const LocationComponent = () => {
           longitude: driver.longitude,
         };
         const distanceFromUser = calculateDistance(location, driverLocation);
-        return distanceFromUser <= 2; // Filter drivers within 2 kilometers
+        return distanceFromUser <= 4; // Filter drivers within 4 kilometers
       });
 
       setNearbyDrivers(nearbyDrivers);

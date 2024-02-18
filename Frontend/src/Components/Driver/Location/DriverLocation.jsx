@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export default function DriverLocation() {
   const [error, setError] = useState(null);
+  const [driverDetails, setDriverDetails] = useState(null);
 
   useEffect(() => {
     const updateDriverLocation = async () => {
@@ -11,13 +12,15 @@ export default function DriverLocation() {
         const { latitude, longitude } = coords;
         const token = localStorage.getItem('token');
         if (token) {
-          const driverId = decodeToken(token).id; // Decode token to get driver ID
+          const driverInfo = decodeToken(token); // Decode token to get driver info
+          const driverId = driverInfo.id;
           const config = {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           };
           await axios.post(`http://localhost:5000/api/driver/driverlocation/${driverId}`, { latitude, longitude }, config);
+          setDriverDetails(driverInfo);
         } else {
           throw new Error('Token not found in local storage');
         }
@@ -49,7 +52,19 @@ export default function DriverLocation() {
 
   return (
     <div>
-      {error ? <p>{error}</p> : <p>Driver location updated successfully.</p>}
+      {error ? (
+        <p>{error}</p>
+      ) : driverDetails ? (
+        <div>
+          <p>Username: {driverDetails.username}</p>
+          <p>Email: {driverDetails.email}</p>
+          <p>Driver ID: {driverDetails.id}</p>
+          <p>Available: {driverDetails.available ? 'Yes' : 'No'}</p>
+          <p>Driver location updated successfully.</p>
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 }

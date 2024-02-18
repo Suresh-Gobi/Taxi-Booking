@@ -49,9 +49,18 @@ exports.loginDriver = async (req, res) => {
     // Define your secret key directly here
     const secretKey = "your_secret_key_here";
     // Generate JWT token
-    const token = jwt.sign({ id: driver._id, email: driver.email }, secretKey, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      {
+        id: driver._id,
+        email: driver.email,
+        username: driver.username,
+        available: driver.available,
+      },
+      secretKey,
+      {
+        expiresIn: "1h",
+      }
+    );
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -65,6 +74,31 @@ exports.getAllAvailableDrivers = async (req, res) => {
 
     res.status(200).json(availableDrivers);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getDriverDetails = async (req, res) => {
+  try {
+    // Extract the token from the request headers
+    const token = req.headers.authorization.split(" ")[1];
+
+    // Verify the token and extract the driver ID
+    const decodedToken = jwt.verify(token, "your_secret_key_here");
+    const driverId = decodedToken.id;
+
+    // Find the driver by ID
+    const driver = await Driver.findById(driverId);
+
+    // Check if the driver exists
+    if (!driver) {
+      return res.status(404).json({ error: "Driver not found" });
+    }
+
+    // Return the driver details
+    res.status(200).json(driver);
+  } catch (error) {
+    // Handle errors
     res.status(500).json({ error: error.message });
   }
 };
@@ -105,6 +139,35 @@ exports.updateDriverCarInfo = async (req, res) => {
     }
     res.status(200).json(driver);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateDriverDetails = async (req, res) => {
+  try {
+    // Extract the token from the request headers
+    const token = req.headers.authorization.split(" ")[1]; // Extract token from Authorization header
+
+    // Verify the token and extract the driver ID
+    const decodedToken = jwt.verify(token, "your_secret_key_here");
+    const driverId = decodedToken.id;
+
+    // Find the driver by ID and update the details
+    const updatedDriver = await Driver.findByIdAndUpdate(
+      driverId,
+      req.body, // Update with the request body
+      { new: true } // Return the updated document
+    );
+
+    // Check if the driver exists
+    if (!updatedDriver) {
+      return res.status(404).json({ error: "Driver not found" });
+    }
+
+    // Return the updated driver details
+    res.status(200).json(updatedDriver);
+  } catch (error) {
+    // Handle errors
     res.status(500).json({ error: error.message });
   }
 };

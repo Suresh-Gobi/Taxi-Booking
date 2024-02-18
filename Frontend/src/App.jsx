@@ -11,13 +11,14 @@ import Login from "./Components/Passenger/Login/Login";
 import DriverSignup from "./Components/Driver/Signup/DriverSignup";
 import Book from "./Components/Location/book";
 import Bookings from "./Components/Driver/Location/Bookings";
+import Profile from "./Components/Driver/Location/Profile";
+import Report from "./Components/Driver/Location/Report";
 
 function App() {
   const [count, setCount] = useState(0);
 
   return (
     <>
-      
       <BrowserRouter>
         <Routes>
           <Route path="/location" element={<Location />} />\
@@ -28,6 +29,8 @@ function App() {
           <Route path="/passengerlogin" element={<Login />} />
           <Route path="/book" element={<Book />} />
           <Route path="/bookings" element={<Bookings />} />
+          <Route path="/driverprofile" element={<Profile />} />
+          <Route path="/driverreport" element={<Report />} />
         </Routes>
       </BrowserRouter>
     </>
