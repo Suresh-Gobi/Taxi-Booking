@@ -1,4 +1,5 @@
 const UnRegistered = require('../Models/UnRegistered.model');
+const { BookingConfirm } = require("../Utils/BookingConfirm");
 
 exports.createUnRegisteredRecord = async (req, res) => {
   try {
@@ -29,6 +30,17 @@ exports.createUnRegisteredRecord = async (req, res) => {
 
     // Save the new UnRegistered record to the database
     await unRegisteredRecord.save();
+
+    // Send email with booking details
+    const emailData = {
+      passengerName,
+      pickupLocation,
+      dropLocation,
+      pickupTime,
+      driverName,
+      driverNumberPlate
+    };
+    await BookingConfirm(emailData);
 
     res.status(201).json(unRegisteredRecord);
   } catch (error) {
