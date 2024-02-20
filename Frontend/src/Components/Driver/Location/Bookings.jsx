@@ -42,6 +42,40 @@ export default function Bookings() {
     fetchBookings();
   }, []); // Empty dependency array ensures useEffect runs only once after the initial render
 
+  // Function to handle accepting a booking
+const handleAcceptBooking = async (bookingId, index) => {
+  try {
+    // Make a PUT request to your backend endpoint to update the booking status to "accepted"
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token not found in local storage");
+    }
+
+    // Create config object with Authorization header
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    // Make a PUT request to update the booking status to "accepted"
+    await axios.put(
+      "http://localhost:5000/api/booking/updatebooking",
+      { bookingId, status: "accepted" }, // Include the booking ID and status to update
+      config
+    );
+
+    // Update the status of the booking in the local state
+    const updatedBookings = [...bookings];
+    updatedBookings[index].status = "accepted";
+    setBookings(updatedBookings);
+  } catch (error) {
+    // Handle error
+    console.error("Error accepting booking:", error);
+  }
+};
+
+
   // Function to handle completing a booking
   const handleCompleteBooking = async (bookingId, index) => {
     try {

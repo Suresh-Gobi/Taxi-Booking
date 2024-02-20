@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Card } from "antd";
 
-export default function DriverLocation() {
+const DriverLocation = () => {
   const [error, setError] = useState(null);
   const [driverDetails, setDriverDetails] = useState(null);
 
@@ -10,7 +11,7 @@ export default function DriverLocation() {
       try {
         const { coords } = await getCurrentPosition();
         const { latitude, longitude } = coords;
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (token) {
           const driverInfo = decodeToken(token); // Decode token to get driver info
           const driverId = driverInfo.id;
@@ -19,25 +20,31 @@ export default function DriverLocation() {
               Authorization: `Bearer ${token}`,
             },
           };
-          await axios.post(`http://localhost:5000/api/driver/driverlocation/${driverId}`, { latitude, longitude }, config);
+          await axios.post(
+            `http://localhost:5000/api/driver/driverlocation/${driverId}`,
+            { latitude, longitude },
+            config
+          );
           setDriverDetails(driverInfo);
         } else {
-          throw new Error('Token not found in local storage');
+          throw new Error("Token not found in local storage");
         }
       } catch (error) {
-        setError('Error updating driver location: ' + error.message);
+        setError("Error updating driver location: " + error.message);
       }
     };
 
     const getCurrentPosition = () => {
       return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+        });
       });
     };
 
     // Function to decode JWT token
     const decodeToken = (token) => {
-      return JSON.parse(atob(token.split('.')[1]));
+      return JSON.parse(atob(token.split(".")[1]));
     };
 
     // Update driver location on component mount
@@ -51,20 +58,22 @@ export default function DriverLocation() {
   }, []);
 
   return (
-    <div>
+    <Card style={{ width: "auto", margin: "auto", marginTop: 40 }}>
       {error ? (
         <p>{error}</p>
       ) : driverDetails ? (
-        <div>
+        <div style={{ textAlign: "right" }}>
           <p>Username: {driverDetails.username}</p>
           <p>Email: {driverDetails.email}</p>
           <p>Driver ID: {driverDetails.id}</p>
-          <p>Available: {driverDetails.available ? 'Yes' : 'No'}</p>
+          <p>Available: {driverDetails.available ? "Yes" : "No"}</p>
           <p>Driver location updated successfully.</p>
         </div>
       ) : (
         <p>Loading...</p>
       )}
-    </div>
+    </Card>
   );
-}
+};
+
+export default DriverLocation;

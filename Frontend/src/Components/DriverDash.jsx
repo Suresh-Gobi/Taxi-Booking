@@ -8,6 +8,8 @@ import { Menu } from "antd";
 
 // Lazy-loaded dummy components
 const Ride = lazy(() => import("../Components/Driver/Location/Bookings"));
+const Profile = lazy(() => import("../Components/Driver/Location/Profile"));
+const Dash = lazy(() => import("../Components/Driver/Location/DriverLocation"));
 
 function getItem(label, key, icon, children, type) {
   return {
@@ -20,6 +22,7 @@ function getItem(label, key, icon, children, type) {
 }
 
 const items = [
+  getItem("DashBoard", "3", <MailOutlined />),
   getItem("My Rides", "1", <MailOutlined />),
   getItem("Manage Route", "sub2", <AppstoreOutlined />, [
     getItem("Routes", "2"),
@@ -27,7 +30,9 @@ const items = [
   {
     type: "divider",
   },
-  getItem("Settings", "sub4", <SettingOutlined />, [getItem("Option 9", "9")]),
+  getItem("Manage Profile", "2", <SettingOutlined />, [
+    getItem("Option 9", "9"),
+  ]),
 ];
 
 const App = () => {
@@ -59,6 +64,8 @@ const App = () => {
       {/* Conditionally render the content based on the selected menu item */}
       <Suspense fallback={<div>Loading...</div>}>
         {selectedMenuItem === "1" && <Ride />}
+        {selectedMenuItem === "2" && <Profile />}
+        {selectedMenuItem === "3" && <Dash />}
       </Suspense>
     </>
   );
