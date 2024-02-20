@@ -13,6 +13,7 @@ import Book from "./Components/Location/book";
 import Bookings from "./Components/Driver/Location/Bookings";
 import Profile from "./Components/Driver/Location/Profile";
 import Report from "./Components/Driver/Location/Report";
+import PassengerDash from "./Components/PassengerDash";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -31,6 +32,7 @@ function App() {
           <Route path="/bookings" element={<Bookings />} />
           <Route path="/driverprofile" element={<Profile />} />
           <Route path="/driverreport" element={<Report />} />
+          <Route path="/passengerdash" element={<PassengerDash />} />
         </Routes>
       </BrowserRouter>
     </>

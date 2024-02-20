@@ -25,6 +25,8 @@ const LocationComponent = () => {
   const [destinationLongitude, setDestinationLongitude] = useState(null);
   const [loggedInUserData, setLoggedInUserData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState(null);
 
   useEffect(() => {
     // Other code remains the same
@@ -235,6 +237,13 @@ const LocationComponent = () => {
     }
   };
 
+  const handleSearchClick = () => {
+    setLoading(true);
+    fetchNearbyDrivers().then(() => {
+      setLoading(false);
+    });
+  };
+
   // Function to calculate distance between two locations using Haversine formula
   const calculateDistance = (location1, location2) => {
     const R = 6371; // Radius of the Earth in kilometers
@@ -275,17 +284,27 @@ const LocationComponent = () => {
     return price;
   };
 
+  const handleViewLocation = (driver) => {
+    setSelectedDriver(driver);
+    setModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setModalVisible(false);
+  };
+
   return (
     <div>
       {/* Logged-in user data */}
-      {loggedInUserData && (
-        <div>
-          <h3>Logged In User Data</h3>
-          <p>Username: {loggedInUserData.username}</p>
-          <p>email: {loggedInUserData.email}</p>
-          <p>ID: {loggedInUserData.id}</p>
-        </div>
-      )}
+      <Card style={{textAlign: "right"}}>
+        {loggedInUserData && (
+          <div>
+            <p>Username: {loggedInUserData.username}</p>
+            <p>Email: {loggedInUserData.email}</p>
+            <p>ID: {loggedInUserData.id}</p>
+          </div>
+        )}
+      </Card>
       {/* Map */}
       <div id="map" style={{ width: "100%", height: "400px" }}></div>
       {/* Buttons and Inputs */}
@@ -321,9 +340,7 @@ const LocationComponent = () => {
           </Col>
         </Row>
       </Card>
-
       <br />
-
       {/* Distance and Price */}
       <Card style={{ textAlign: "left" }}>
         <Row gutter={[16, 16]}>
@@ -363,41 +380,73 @@ const LocationComponent = () => {
             </Col>
           )}
         </Row>
+
+        {/* Centered Button */}
+        <Row justify="center">
+          <Button
+            onClick={handleSearchClick}
+            style={{
+              fontSize: "20px",
+              height: "50px",
+              width: "500px",
+              alignItems: "center",
+            }}
+            type="primary"
+            ghost
+            loading={loading}
+          >
+            Search For Car
+          </Button>
+        </Row>
       </Card>
-
-      {/* Car card */}
-      <div>
-        <Button
-          onClick={fetchNearbyDrivers}
-          style={{ fontSize: "20px", height: "50px", width: "200px" }}
-          type="primary"
-          ghost
-        >
-          Search For Car
-        </Button>
-      </div>
-
       {/* Nearby Drivers */}
-      <div>
-        <h3>Nearby Drivers</h3>
+      <Card title="Nearby Drivers" style={{ textAlign: "left" }}>
         {nearbyDrivers.map((driver) => (
-          <div key={driver._id}>
-            <p>Driver ID: {driver._id}</p>
-            <p>Driver: {driver.username}</p>
-            <p>Email: {driver.email}</p>
-            <p>Status: {driver.available}</p>
-            <p>Latitude: {driver.latitude}</p>
-            <p>Longitude: {driver.longitude}</p>
+          <Card key={driver._id} style={{ marginBottom: "16px" }}>
+            <Typography.Paragraph>
+              <Typography.Text strong>Driver ID:</Typography.Text> {driver._id}
+            </Typography.Paragraph>
+            <Typography.Paragraph>
+              <Typography.Text strong>Driver:</Typography.Text>{" "}
+              {driver.username}
+            </Typography.Paragraph>
+            <Typography.Paragraph>
+              <Typography.Text strong>Email:</Typography.Text> {driver.email}
+            </Typography.Paragraph>
+            <Typography.Paragraph>
+              <Typography.Text strong>Status:</Typography.Text>{" "}
+              <span style={{ color: driver.available ? "green" : "red" }}>
+                {driver.available ? "Available" : "Unavailable"}
+              </span>
+            </Typography.Paragraph>
+            {/* <Typography.Paragraph>
+              <Typography.Text strong>Latitude:</Typography.Text>{" "}
+              {driver.latitude}
+            </Typography.Paragraph>
+            <Typography.Paragraph>
+              <Typography.Text strong>Longitude:</Typography.Text>{" "}
+              {driver.longitude}
+            </Typography.Paragraph> */}
             <Button
               type="primary"
               onClick={() => handleBookNow(driver._id)}
+              ghost
               loading={loading}
             >
               Book Now
             </Button>
-          </div>
+            <Button
+              type="default"
+              style={{ marginLeft: "8px" }}
+              onClick={() => handleViewLocation()}
+              icon={<EnvironmentOutlined />}
+            >
+              View Location
+            </Button>
+          </Card>
         ))}
-      </div>
+      </Card>
+      ;
     </div>
   );
 };
