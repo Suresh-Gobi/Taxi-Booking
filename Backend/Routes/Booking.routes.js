@@ -7,6 +7,7 @@ router.post('/book', bookingController.createBooking);
 router.get('/dbooking', bookingController.showBooking);
 router.put('/updatebooking', bookingController.acceptBooking);
 router.put('/completebooking', bookingController.completeBooking);
+router.get('/bookingstatus', bookingController.showBookingStatus);
 
 //Un-Registered Passengers
 router.post('/completebooking', unregbookingController.createUnRegisteredRecord);

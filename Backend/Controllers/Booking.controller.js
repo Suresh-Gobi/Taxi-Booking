@@ -160,4 +160,32 @@ exports.completeBooking = async (req, res) => {
   }
 };
 
+exports.showBookingStatus = async (req, res) => {
+  try {
+    // Get the token from the request headers
+    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
 
+    // Verify the token using the secret key
+    const decodedToken = jwt.verify(token, secretKey);
+
+    // Extract passenger ID from the decoded token
+    const passengerId = decodedToken.id;
+
+    // Find the passenger in the database
+    const passenger = await Passenger.findById(passengerId);
+
+    if (!passenger) {
+      return res.status(404).json({ error: 'Passenger not found' });
+    }
+
+    // Find bookings related to the passenger
+    const bookings = await Booking.find({ 'passenger._id': passengerId });
+
+    res.status(200).json({ passenger, bookings });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    res.status(500).json({ error: error.message });
+  }
+};

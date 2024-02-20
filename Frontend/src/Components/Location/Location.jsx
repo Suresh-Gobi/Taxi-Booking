@@ -336,6 +336,7 @@ const LocationComponent = () => {
               placeholder="Enter destination"
               onSearch={showRoute}
               enterButton="Search"
+              ghost
             />
           </Col>
         </Row>
@@ -432,6 +433,7 @@ const LocationComponent = () => {
               onClick={() => handleBookNow(driver._id)}
               ghost
               loading={loading}
+              to='/pending'
             >
               Book Now
             </Button>

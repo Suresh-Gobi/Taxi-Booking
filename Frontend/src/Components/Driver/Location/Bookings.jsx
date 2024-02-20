@@ -1,9 +1,11 @@
-// Import useState and useEffect from React
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Card, Button, Spin, Modal } from "antd";
 
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     // Fetch bookings related to the logged-in driver
@@ -73,43 +75,83 @@ export default function Bookings() {
     }
   };
 
+  // Function to handle showing map details in modal
+  const handleShowMap = (booking) => {
+    setSelectedBooking(booking);
+    setModalVisible(true);
+  };
+
   return (
     <div>
       <h1>Bookings</h1>
-      <ul>
-        {/* Map through the bookings array and display booking details */}
-        {bookings.map((booking, index) => (
-          <li key={index}>
-            {/* Display booking details */}
-            <p>Booking ID: {booking._id}</p>
-            <p>Distance: {booking.distance}</p>
-            <p>Price: {booking.price}</p>
-            <p>Status: {booking.status}</p>
+      {bookings.length === 0 && <Spin />}{" "}
+      {/* Show spinner if bookings are loading */}
+      {bookings.map((booking, index) => (
+        <Card key={index} style={{ marginBottom: "16px", textAlign: "left" }}>
+          <p>Booking ID: {booking._id}</p>
+          <p>Distance: {booking.distance}</p>
+          <p>Price: {booking.price}</p>
+          <p>Status: {booking.status}</p>
+          <p>
+            Pickup Location: Latitude - {booking.pickupLocation.coordinates[1]},
+            Longitude - {booking.pickupLocation.coordinates[0]}
+          </p>
+          <p>
+            Drop Location: Latitude - {booking.dropLocation.coordinates[1]},
+            Longitude - {booking.dropLocation.coordinates[0]}
+          </p>
+          {/* Conditional rendering for accept or complete button */}
+          {booking.status === "pending" ? (
+            <Button
+              type="primary"
+              onClick={() => handleAcceptBooking(booking._id, index)}
+            >
+              Accept
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              onClick={() => handleCompleteBooking(booking._id, index)}
+              disabled={booking.status === "completed"}
+            >
+              Complete
+            </Button>
+          )}
+          <Button onClick={() => handleShowMap(booking)}>Show in Map</Button>
+        </Card>
+      ))}
+      {/* Modal for displaying map details */}
+      <Modal
+        title="Map Details"
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+      >
+        {/* Render map details here */}
+        {selectedBooking && (
+          <div>
             <p>
-              Pickup Location: Latitude -{" "}
-              {booking.pickupLocation.coordinates[1]}, Longitude -{" "}
-              {booking.pickupLocation.coordinates[0]}
+              Pickup Location:{" "}
+              {selectedBooking.pickupLocation.coordinates.join(", ")}
             </p>
             <p>
-              Drop Location: Latitude - {booking.dropLocation.coordinates[1]},
-              Longitude - {booking.dropLocation.coordinates[0]}
+              Drop Location:{" "}
+              {selectedBooking.dropLocation.coordinates.join(", ")}
             </p>
-            {/* Conditional rendering for accept or complete button */}
-            {booking.status === "pending" ? (
-              <button onClick={() => handleAcceptBooking(booking._id, index)}>
-                Accept
-              </button>
-            ) : (
-              <button
-                onClick={() => handleCompleteBooking(booking._id, index)}
-                disabled={booking.status === "completed"}
-              >
-                Complete
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+            {/* Add your map component here */}
+            {/* For example: */}
+            <iframe
+              width="100%"
+              height="400"
+              frameborder="0"
+              scrolling="no"
+              marginheight="0"
+              marginwidth="0"
+              src={`https://www.google.com/maps/embed/v1/directions?key=AIzaSyA2pOk0aC3V-7hz_CXpUQn-IQWpbVmFAbw&origin=${selectedBooking.pickupLocation.coordinates[1]},${selectedBooking.pickupLocation.coordinates[0]}&destination=${selectedBooking.dropLocation.coordinates[1]},${selectedBooking.dropLocation.coordinates[0]}&mode=driving`}
+            ></iframe>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
