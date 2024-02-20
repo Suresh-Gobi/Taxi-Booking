@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import io from "socket.io-client";
+import { Button, Input, message, Typography, Row, Col, Card } from "antd";
+import {
+  EnvironmentOutlined,
+  LoadingOutlined,
+  DollarOutlined,
+  FieldTimeOutlined,
+} from "@ant-design/icons";
+
+const { Search } = Input;
 
 const socket = io.connect("http://localhost:5000");
 
@@ -15,6 +24,7 @@ const LocationComponent = () => {
   const [destinationLatitude, setDestinationLatitude] = useState(null);
   const [destinationLongitude, setDestinationLongitude] = useState(null);
   const [loggedInUserData, setLoggedInUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Other code remains the same
@@ -32,7 +42,7 @@ const LocationComponent = () => {
       setLoggedInUserData({ username, id, email });
     }
   };
-  
+
   // Call the function to extract user data from token
   useEffect(() => {
     extractUserDataFromToken();
@@ -45,17 +55,17 @@ const LocationComponent = () => {
       if (!token) {
         throw new Error("Token not found in local storage");
       }
-  
+
       // Decode token to extract passenger details
       const { id: passengerId, email, username } = decodeToken(token);
-  
+
       // Create config object with Authorization header
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       };
-  
+
       // Send booking details to the backend API
       const response = await axios.post(
         "http://localhost:5000/api/booking/book",
@@ -77,7 +87,7 @@ const LocationComponent = () => {
         },
         config
       );
-  
+
       // Handle successful booking response
       console.log("Booking created:", response.data);
       // You can perform additional actions here, such as updating the UI or showing a success message.
@@ -87,7 +97,6 @@ const LocationComponent = () => {
       // You can display an error message to the user or perform other error handling actions.
     }
   };
-  
 
   useEffect(() => {
     // Get user's initial location automatically
@@ -268,7 +277,7 @@ const LocationComponent = () => {
 
   return (
     <div>
-      {/* Display logged-in user data */}
+      {/* Logged-in user data */}
       {loggedInUserData && (
         <div>
           <h3>Logged In User Data</h3>
@@ -277,35 +286,98 @@ const LocationComponent = () => {
           <p>ID: {loggedInUserData.id}</p>
         </div>
       )}
+      {/* Map */}
       <div id="map" style={{ width: "100%", height: "400px" }}></div>
-      <div>
-        <button onClick={handleCurrentLocationClick}>
-          Fetch Current Location
-        </button>
-        <input
-          type="text"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-          placeholder="Enter destination"
-        />
-        <button onClick={showRoute}>Show Route</button>
-      </div>
-      {location && (
-        <p>
-          Latitude: {location.latitude}, Longitude: {location.longitude}
-        </p>
-      )}
+      {/* Buttons and Inputs */}
+      <Card>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12}>
+            <Button
+              onClick={handleCurrentLocationClick}
+              style={{ textAlign: "left" }}
+              type="primary"
+              ghost // Set ghost to true to remove hover effect
+            >
+              Fetch Current Location
+            </Button>
+            {/* Location information */}
+            {location && (
+              <p style={{ fontSize: "10px" }}>
+                Latitude: {location.latitude}, Longitude: {location.longitude}
+              </p>
+            )}
+          </Col>
+          <Col xs={24} sm={12}>
+            <div style={{ textAlign: "left", marginBottom: "8px" }}>
+              Search for Destination
+            </div>
+            <Input.Search
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              placeholder="Enter destination"
+              onSearch={showRoute}
+              enterButton="Search"
+            />
+          </Col>
+        </Row>
+      </Card>
 
-      {/* Display the distance in kilometers */}
-      {distance && <p>Distance: {distance} km</p>}
-      {price && <p>Fixed Price: {price} /=</p>}
-      {destinationLatitude && destinationLongitude && (
-        <p>
-          Destination Latitude: {destinationLatitude}, Destination Longitude:{" "}
-          {destinationLongitude}
-        </p>
-      )}
-      {/* Display nearby drivers */}
+      <br />
+
+      {/* Distance and Price */}
+      <Card style={{ textAlign: "left" }}>
+        <Row gutter={[16, 16]}>
+          {distance && (
+            <Col span={24}>
+              <Typography.Paragraph>
+                <Typography.Text strong>
+                  <FieldTimeOutlined /> Distance:
+                </Typography.Text>{" "}
+                <Typography.Text style={{ fontSize: "24px" }}>
+                  {distance} km
+                </Typography.Text>
+              </Typography.Paragraph>
+            </Col>
+          )}
+          {price && (
+            <Col span={24}>
+              <Typography.Paragraph>
+                <Typography.Text strong>
+                  <DollarOutlined /> Fixed Price:
+                </Typography.Text>{" "}
+                <Typography.Text style={{ fontSize: "24px" }}>
+                  {price} /=
+                </Typography.Text>
+              </Typography.Paragraph>
+            </Col>
+          )}
+          {destinationLatitude && destinationLongitude && (
+            <Col span={24}>
+              <Typography.Paragraph>
+                <Typography.Text strong>
+                  <EnvironmentOutlined /> Destination:
+                </Typography.Text>{" "}
+                Latitude: {destinationLatitude}, Longitude:{" "}
+                {destinationLongitude}
+              </Typography.Paragraph>
+            </Col>
+          )}
+        </Row>
+      </Card>
+
+      {/* Car card */}
+      <div>
+        <Button
+          onClick={fetchNearbyDrivers}
+          style={{ fontSize: "20px", height: "50px", width: "200px" }}
+          type="primary"
+          ghost
+        >
+          Search For Car
+        </Button>
+      </div>
+
+      {/* Nearby Drivers */}
       <div>
         <h3>Nearby Drivers</h3>
         {nearbyDrivers.map((driver) => (
@@ -316,17 +388,15 @@ const LocationComponent = () => {
             <p>Status: {driver.available}</p>
             <p>Latitude: {driver.latitude}</p>
             <p>Longitude: {driver.longitude}</p>
-            <button onClick={() => handleBookNow(driver._id)}>Book Now</button>
+            <Button
+              type="primary"
+              onClick={() => handleBookNow(driver._id)}
+              loading={loading}
+            >
+              Book Now
+            </Button>
           </div>
         ))}
-      </div>
-
-      {/* Car card */}
-      <div
-        style={{ marginTop: "20px", border: "1px solid #ccc", padding: "10px" }}
-      >
-        <h3>Car</h3>
-        <button onClick={fetchNearbyDrivers}>Search For Car</button>
       </div>
     </div>
   );
