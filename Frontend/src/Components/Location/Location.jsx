@@ -269,11 +269,11 @@ const LocationComponent = () => {
   const calculatePrice = (distanceInKm) => {
     let price = 0;
     if (distanceInKm > 0 && distanceInKm <= 100) {
-      price = 50;
+      price = 500;
     } else if (distanceInKm > 100 && distanceInKm <= 200) {
-      price = 100;
+      price = 10000;
     } else if (distanceInKm > 200 && distanceInKm <= 300) {
-      price = 150;
+      price = 15000;
     } else if (distanceInKm > 300 && distanceInKm <= 400) {
       price = 200;
     } else if (distanceInKm > 400 && distanceInKm <= 500) {

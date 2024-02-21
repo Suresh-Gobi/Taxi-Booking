@@ -160,7 +160,7 @@ exports.completeBooking = async (req, res) => {
   }
 };
 
-exports.showBookingStatus = async (req, res) => {
+exports.showPendingBookings = async (req, res) => {
   try {
     // Get the token from the request headers
     const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
@@ -178,8 +178,8 @@ exports.showBookingStatus = async (req, res) => {
       return res.status(404).json({ error: 'Passenger not found' });
     }
 
-    // Find bookings related to the passenger
-    const bookings = await Booking.find({ 'passenger._id': passengerId });
+    // Find pending bookings related to the passenger
+    const bookings = await Booking.find({ 'passenger._id': passengerId, status: 'pending' });
 
     res.status(200).json({ passenger, bookings });
   } catch (error) {

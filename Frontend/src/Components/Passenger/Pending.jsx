@@ -1,58 +1,76 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Spin } from "antd";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Spin } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
-const BookingStatus = () => {
+export default function Pending() {
+  const [pendingBookings, setPendingBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [bookingStatus, setBookingStatus] = useState(null);
-  const [passengerDetails, setPassengerDetails] = useState(null);
+  const [redirect, setRedirect] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBookingStatus = async () => {
+    const fetchPendingBookings = async () => {
       try {
-        // Retrieve passenger details from local storage
-        const token = localStorage.getItem("token");
+        // Extract token from local storage
+        const token = localStorage.getItem('token');
         if (!token) {
-          throw new Error("Token not found in local storage");
+          throw new Error('Token not found in local storage');
         }
 
-        // Extract passenger ID from the token
-        const passengerId = token.split(".")[1];
+        // Create config object with Authorization header
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
 
-        // Make API call to fetch booking status
-        const response = await axios.get(
-          `http://localhost:5000/api/booking/bookingstatus/${passengerId}`
-        );
-        setBookingStatus(response.data.status);
-        setPassengerDetails({
-          id: passengerId,
-          // You might need to decode other information from the token if required
-        });
+        // Make a GET request to the API endpoint with token in headers
+        console.log('Fetching pending bookings...');
+        const response = await axios.get('http://localhost:5000/api/booking/bookingstatus', config);
+
+        // Filter out only the pending bookings
+        const pendingBookingsData = response.data.filter(booking => booking.status === 'pending');
+
+        // Set the pending bookings in state
+        console.log('Pending bookings:', pendingBookingsData);
+        setPendingBookings(pendingBookingsData);
         setLoading(false);
+
+        // Redirect after 10 seconds
+        setTimeout(() => {
+          console.log('Redirecting to /driver...');
+          setRedirect(true);
+        }, 10000);
       } catch (error) {
-        console.error("Error fetching booking status:", error);
+        console.error('Error fetching pending bookings:', error);
         setLoading(false);
       }
     };
 
-    fetchBookingStatus();
+    // Call the fetchPendingBookings function when the component mounts
+    fetchPendingBookings();
   }, []);
 
-  if (loading) {
-    return <Spin />;
-  }
+  useEffect(() => {
+    if (redirect) {
+      console.log('Redirecting...');
+      navigate('/driver');
+    }
+  }, [redirect, navigate]);
 
   return (
     <div>
-      <h2>Passenger Details</h2>
-      <p>ID: {passengerDetails && passengerDetails._id}</p>
-      {/* Render other passenger details as needed */}
-      <h2>Booking Status</h2>
-      {bookingStatus === "pending" && <div>Pending</div>}
-      {bookingStatus === "accepted" && <div>Accepted</div>}
-      {bookingStatus === "completed" && <div>Completed</div>}
+      <h1>Pending Bookings</h1>
+      <Spin tip="Wait for Driver Acceptance!" spinning={loading} size="large">
+        <ul>
+          {pendingBookings.map(booking => (
+            <li key={booking._id}>
+              <p>Status: {booking.status}</p>
+            </li>
+          ))}
+        </ul>
+      </Spin>
     </div>
   );
-};
-
-export default BookingStatus;
+}

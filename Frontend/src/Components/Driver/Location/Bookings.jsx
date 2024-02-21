@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, Button, Spin, Modal } from "antd";
+import { useNavigate } from "react-router-dom";
 
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch bookings related to the logged-in driver
@@ -43,39 +45,39 @@ export default function Bookings() {
   }, []); // Empty dependency array ensures useEffect runs only once after the initial render
 
   // Function to handle accepting a booking
-const handleAcceptBooking = async (bookingId, index) => {
-  try {
-    // Make a PUT request to your backend endpoint to update the booking status to "accepted"
-    const token = localStorage.getItem("token");
-    if (!token) {
-      throw new Error("Token not found in local storage");
+  const handleAcceptBooking = async (bookingId, index) => {
+    try {
+      // Make a PUT request to your backend endpoint to update the booking status to "accepted"
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token not found in local storage");
+      }
+
+      // Create config object with Authorization header
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      // Make a PUT request to update the booking status to "accepted"
+      await axios.put(
+        "http://localhost:5000/api/booking/updatebooking",
+        { bookingId, status: "accepted" }, // Include the booking ID and status to update
+        config
+      );
+
+      // Update the status of the booking in the local state
+      const updatedBookings = [...bookings];
+      updatedBookings[index].status = "accepted";
+      setBookings(updatedBookings);
+    } catch (error) {
+      // Handle error
+      console.error("Error accepting booking:", error);
     }
+  };
 
-    // Create config object with Authorization header
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    // Make a PUT request to update the booking status to "accepted"
-    await axios.put(
-      "http://localhost:5000/api/booking/updatebooking",
-      { bookingId, status: "accepted" }, // Include the booking ID and status to update
-      config
-    );
-
-    // Update the status of the booking in the local state
-    const updatedBookings = [...bookings];
-    updatedBookings[index].status = "accepted";
-    setBookings(updatedBookings);
-  } catch (error) {
-    // Handle error
-    console.error("Error accepting booking:", error);
-  }
-};
-
-
+  // Function to handle completing a booking
   // Function to handle completing a booking
   const handleCompleteBooking = async (bookingId, index) => {
     try {
@@ -103,6 +105,12 @@ const handleAcceptBooking = async (bookingId, index) => {
       const updatedBookings = [...bookings];
       updatedBookings[index].status = "completed";
       setBookings(updatedBookings);
+
+      // Navigate to "/payment" page with query parameters
+      const { distance, price } = bookings[index]; // Assuming distance and price are properties of the booking object
+      navigate(
+        `/payment?distance=${distance}&price=${price}&bookingId=${bookingId}`
+      );
     } catch (error) {
       // Handle error
       console.error("Error completing booking:", error);

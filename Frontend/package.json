@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@types/react-chartjs-2": "^2.5.7",
+    "ant": "^0.2.0",
     "antd": "^5.14.1",
     "axios": "^1.6.7",
     "chart.js": "^4.4.1",
