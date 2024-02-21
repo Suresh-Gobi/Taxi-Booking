@@ -16,6 +16,7 @@ import Report from "./Components/Driver/Location/Report";
 import PassengerDash from "./Components/PassengerDash";
 import Pending from "./Components/Passenger/Pending";
 import DriverDash from "./Components/DriverDash";
+import AdminDash from "./Components/AdminDash";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -37,6 +38,7 @@ function App() {
           <Route path="/passengerdash" element={<PassengerDash />} />
           <Route path="/pending" element={<Pending />} />
           <Route path="/driverdash" element={<DriverDash />} />
+          <Route path="/admindash" element={<AdminDash />} />
         </Routes>
       </BrowserRouter>
     </>
