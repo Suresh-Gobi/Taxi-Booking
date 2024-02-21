@@ -9,6 +9,7 @@ const passengerRoutes = require("./Routes/Passenger.route");
 const driverRoutes = require("./Routes/Driver.routes");
 const bookRoutes = require("./Routes/Booking.routes");
 const paymentRoutes = require("./Routes/Payment.routes");
+const adminRoutes = require("./Routes/Admin.routes");
 
 const app = express();
 app.use(cors({ origin: '*' })); 
@@ -40,6 +41,7 @@ app.use("/api/passenger", passengerRoutes);
 app.use("/api/driver", driverRoutes);
 app.use("/api/booking", bookRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Set up Socket.io connection
 io.on("connection", (socket) => {

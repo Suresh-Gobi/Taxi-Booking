@@ -71,3 +71,51 @@ exports.passengerLogin = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getAllPassengers = async (req, res) => {
+  try {
+    // Query the database to find all passengers
+    const passengers = await Passenger.find();
+
+    res.status(200).json(passengers); // Return the list of passengers as JSON response
+  } catch (error) {
+    res.status(500).json({ error: error.message }); // Return an error if something goes wrong
+  }
+};
+
+// Controller to update passenger details
+exports.updatePassenger = async (req, res) => {
+  try {
+    const { id } = req.params; // Get the passenger ID from the request parameters
+    const updates = req.body; // Get the updates from the request body
+
+    // Find the passenger by ID and update their details
+    const updatedPassenger = await Passenger.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!updatedPassenger) {
+      return res.status(404).json({ message: 'Passenger not found' });
+    }
+
+    res.status(200).json(updatedPassenger); // Return the updated passenger
+  } catch (error) {
+    res.status(500).json({ error: error.message }); // Return an error if something goes wrong
+  }
+};
+
+// Controller to delete a passenger
+exports.deletePassenger = async (req, res) => {
+  try {
+    const { id } = req.params; // Get the passenger ID from the request parameters
+
+    // Find the passenger by ID and delete them
+    const deletedPassenger = await Passenger.findByIdAndDelete(id);
+
+    if (!deletedPassenger) {
+      return res.status(404).json({ message: 'Passenger not found' });
+    }
+
+    res.status(200).json({ message: 'Passenger deleted successfully' }); // Return success message
+  } catch (error) {
+    res.status(500).json({ error: error.message }); // Return an error if something goes wrong
+  }
+};

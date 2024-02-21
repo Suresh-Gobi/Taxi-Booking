@@ -11,7 +11,7 @@ router.get("/bookingstatus", bookingController.showPendingBookings);
 
 //Un-Registered Passengers
 router.post(
-  "/completebooking",
+  "/unreg",
   unregbookingController.createUnRegisteredRecord
 );
 

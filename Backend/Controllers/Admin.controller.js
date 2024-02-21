@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Admin = require('../models/Admin');
+const Admin = require('../Models/Admin.model');
 
 // Controller for admin signup
 exports.signup = async (req, res) => {
@@ -33,6 +33,8 @@ exports.signup = async (req, res) => {
 };
 
 // Controller for admin login
+const jwtSecret = 'your_secret_key_here'; // Define your secret key here
+
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -49,11 +51,12 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Generate JWT token using the secret key directly
+    const token = jwt.sign({ id: admin._id }, jwtSecret, { expiresIn: '1h' });
 
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+

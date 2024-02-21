@@ -5,6 +5,7 @@ exports.createUnRegisteredRecord = async (req, res) => {
   try {
     const {
       passengerName,
+      email, // Include email field from the request body
       address,
       phone,
       pickupLocation,
@@ -18,6 +19,7 @@ exports.createUnRegisteredRecord = async (req, res) => {
     // Create a new instance of the UnRegistered model
     const unRegisteredRecord = new UnRegistered({
       passengerName,
+      email, // Include email field in the UnRegistered record
       address,
       phone,
       pickupLocation,
@@ -34,12 +36,15 @@ exports.createUnRegisteredRecord = async (req, res) => {
     // Send email with booking details
     const emailData = {
       passengerName,
+      email,
       pickupLocation,
       dropLocation,
       pickupTime,
       driverName,
       driverNumberPlate
     };
+
+    // Send email using your email service
     await BookingConfirm(emailData);
 
     res.status(201).json(unRegisteredRecord);

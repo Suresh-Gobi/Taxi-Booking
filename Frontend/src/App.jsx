@@ -18,6 +18,10 @@ import Pending from "./Components/Passenger/Pending";
 import DriverDash from "./Components/DriverDash";
 import AdminDash from "./Components/AdminDash";
 import Payment from "./Components/Driver/Location/Payment";
+import Adminsignup from "./Components/Admin/Dashboard/Signup";
+import AdminLogin from "./Components/Admin/Dashboard/Login";
+import Unreg from "./Components/Admin/Dashboard/unreg";
+import DriverDetails  from "./Components/Admin/Dashboard/DriverDetails";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -41,6 +45,11 @@ function App() {
           <Route path="/driverdash" element={<DriverDash />} />
           <Route path="/admindash" element={<AdminDash />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/adminsignup" element={<Adminsignup />} />
+          <Route path="/adminlogin" element={<AdminLogin />} />
+          <Route path="/unreg" element={<Unreg />} />
+          <Route path="/driverdet" element={<DriverDetails />} />
+          
         </Routes>
       </BrowserRouter>
     </>

@@ -12,11 +12,11 @@ const transporter = nodemailer.createTransport({
 });
 
 const BookingConfirm = (emailData) => {
-  const { passengerName, pickupLocation, dropLocation, pickupTime, driverName, driverNumberPlate } = emailData;
+  const { passengerName, email, pickupLocation, dropLocation, pickupTime, driverName, driverNumberPlate } = emailData;
 
   const mailOptions = {
     from: SMTP_USER,
-    to: emailData.email,
+    to: email,
     subject: 'Booking Confirmation',
     html: `
       <div>
