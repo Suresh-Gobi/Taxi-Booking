@@ -1,62 +1,106 @@
-import React, { useState, useEffect } from "react";
-import { Card } from "antd";
-
+import React, { useState, useEffect } from 'react';
+import { Card } from 'antd';
+import Chart from 'chart.js/auto';
 const { Meta } = Card;
 
 export default function Adminboard() {
   const [totalPassengerCount, setTotalPassengerCount] = useState(0);
   const [totalDriverCount, setTotalDriverCount] = useState(0);
   const [totalPaymentCount, setTotalPaymentCount] = useState(0);
+  const [totalBookingCount, setTotalBookingCount] = useState(0); // New state for total booking count
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const passengerResponse = await fetch(
-          "http://localhost:5000/api/admin/passengercount"
-        );
+        // Fetch passenger count
+        const passengerResponse = await fetch('http://localhost:5000/api/admin/passengercount');
         const passengerData = await passengerResponse.json();
-        console.log("Passenger Data:", passengerData); // Log passenger data
-        const passengerCount = passengerData.count; // Assuming count is the key returned from backend
+        const passengerCount = passengerData.count;
         setTotalPassengerCount(passengerCount);
-  
-        const driverResponse = await fetch(
-          "http://localhost:5000/api/admin/drivercount"
-        );
+
+        // Fetch driver count
+        const driverResponse = await fetch('http://localhost:5000/api/admin/drivercount');
         const driverData = await driverResponse.json();
-        console.log("Driver Data:", driverData); // Log driver data
-        const driverCount = driverData.count; // Assuming count is the key returned from backend
+        const driverCount = driverData.count;
         setTotalDriverCount(driverCount);
-  
-        const paymentResponse = await fetch(
-          "http://localhost:5000/api/admin/paymentcount"
-        );
+
+        // Fetch payment count
+        const paymentResponse = await fetch('http://localhost:5000/api/admin/paymentcount');
         const paymentData = await paymentResponse.json();
-        console.log("Payment Data:", paymentData); // Log payment data
         const paymentCount = paymentData.totalCount;
         setTotalPaymentCount(paymentCount);
-  
-        // Calculate the total count
-        const total = passengerCount + driverCount + paymentCount;
-        console.log("Total:", total);
+
+        // Fetch total booking count
+        const bookingResponse = await fetch('http://localhost:5000/api/admin/totalbook');
+        const bookingData = await bookingResponse.json();
+        const bookingCount = bookingData.totalCount;
+        setTotalBookingCount(bookingCount);
+
+        // Call createChart function with updated counts
+        createChart(passengerCount, driverCount);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     }
-  
+
     fetchData();
-  }, []);
-  
+  }, [totalPassengerCount, totalDriverCount, totalPaymentCount, totalBookingCount]); // Update the chart whenever these values change
+
+  // Function to create Chart.js chart
+  const createChart = (passengerCount, driverCount) => {
+    const ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Passengers', 'Drivers', 'Bookings'], // Add 'Bookings' label
+        datasets: [
+          {
+            label: 'Total Registered',
+            data: [passengerCount, driverCount, totalBookingCount], // Add totalBookingCount
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(75, 192, 192, 0.2)', // Add color for Bookings
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(75, 192, 192, 1)', // Add color for Bookings
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  };
 
   return (
-    <div style={{ display: "flex", justifyContent: "space-around" }}>
-      <Card title="Total Registered Passengers" style={{ width: 300 }}>
-        <Meta title={totalPassengerCount} />
-      </Card>
-      <Card title="Total Registered Drivers" style={{ width: 300 }}>
-        <Meta title={totalDriverCount} />
-      </Card>
-      <Card title="Total Payments" style={{ width: 300 }}>
-        <Meta title={totalPaymentCount} />
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+        <Card title="Total Registered Passengers" style={{ width: 300 }}>
+          <Meta title={totalPassengerCount} />
+        </Card>
+        <Card title="Total Registered Drivers" style={{ width: 300 }}>
+          <Meta title={totalDriverCount} />
+        </Card>
+        <Card title="Total Payments" style={{ width: 300 }}>
+          <Meta title={totalPaymentCount} />
+        </Card>
+        <Card title="Total Bookings" style={{ width: 300 }}>
+          <Meta title={totalBookingCount} />
+        </Card>
+      </div>
+      <Card>
+        <div style={{ textAlign: 'center' }}>
+          <canvas id="myChart" width="200" height="200"></canvas>
+        </div>
       </Card>
     </div>
   );

@@ -13,5 +13,7 @@ router.delete("/admindrdelete/:id", adminController.deleteDriverDetails);
 router.get('/drivercount', adminController.getDriverCount);
 router.get('/passengercount', adminController.getPassengerCount);
 router.get('/paymentcount', adminController.getPaymentCount);
+router.get('/bookdet', adminController.getBookingDetails);
+router.get('/totalbook', adminController.getTotalBookingCount);
 
 module.exports = router;

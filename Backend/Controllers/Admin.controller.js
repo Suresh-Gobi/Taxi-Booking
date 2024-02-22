@@ -4,6 +4,7 @@ const Admin = require('../Models/Admin.model');
 const Driver = require('../Models/Driver.model');
 const Passenger = require('../Models/Passenger.model');
 const Payment = require('../Models/Payment.model');
+const Booking = require('../Models/Booking.model');
 
 // Controller for admin signup
 exports.signup = async (req, res) => {
@@ -72,6 +73,17 @@ exports.getDriverDetails = async (req, res) => {
   }
 };
 
+exports.getBookingDetails = async (req, res) => {
+  try {
+    // Fetch all booking records from the database
+    const bookings = await Booking.find();
+    res.json(bookings);
+  } catch (error) {
+    console.error("Error fetching booking details:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 exports.getPassengerCount = async (req, res) => {
   try {
     const count = await Passenger.countDocuments();
@@ -85,6 +97,15 @@ exports.getDriverCount = async (req, res) => {
   try {
     const count = await Driver.countDocuments();
     res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getTotalBookingCount = async (req, res) => {
+  try {
+    const totalCount = await Booking.countDocuments();
+    res.status(200).json({ totalCount });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

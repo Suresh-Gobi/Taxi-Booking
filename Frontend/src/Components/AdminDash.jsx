@@ -20,6 +20,11 @@ const PaymentDetails = lazy(() =>
   import("../Components/Admin/Dashboard/Payment")
 );
 
+const BookDetails = lazy(() =>
+  import("../Components/Admin/Dashboard/BookingHistory")
+);
+
+
 function getItem(label, key, icon, children, type) {
   return {
     key,
@@ -36,9 +41,7 @@ const items = [
   getItem("Passenger Details", "3", <MailOutlined />),
   getItem("Driver Details", "4", <MailOutlined />),
   getItem("Payment Details", "5", <MailOutlined />),
-  getItem("Manage Route", "sub2", <AppstoreOutlined />, [
-    getItem("Routes", "2"),
-  ]),
+  getItem("Booking History", "6", <MailOutlined />),
   {
     type: "divider",
   },
@@ -80,6 +83,7 @@ const App = () => {
         {selectedMenuItem === "3" && <PassDetails />}
         {selectedMenuItem === "4" && <DrDetails />}
         {selectedMenuItem === "5" && <PaymentDetails />}
+        {selectedMenuItem === "6" && <BookDetails />}
       </Suspense>
     </>
   );
