@@ -10,5 +10,8 @@ router.post("/adminlogin", adminController.login);
 router.get("/admindrget", adminController.getDriverDetails);
 router.put("/admindrupdate/:id", adminController.updateDriverDetails);
 router.delete("/admindrdelete/:id", adminController.deleteDriverDetails);
+router.get('/drivercount', adminController.getDriverCount);
+router.get('/passengercount', adminController.getPassengerCount);
+router.get('/paymentcount', adminController.getPaymentCount);
 
 module.exports = router;

@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Admin = require('../Models/Admin.model');
 const Driver = require('../Models/Driver.model');
+const Passenger = require('../Models/Passenger.model');
+const Payment = require('../Models/Payment.model');
 
 // Controller for admin signup
 exports.signup = async (req, res) => {
@@ -65,6 +67,33 @@ exports.getDriverDetails = async (req, res) => {
   try {
     const drivers = await Driver.find();
     res.status(200).json(drivers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getPassengerCount = async (req, res) => {
+  try {
+    const count = await Passenger.countDocuments();
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getDriverCount = async (req, res) => {
+  try {
+    const count = await Driver.countDocuments();
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getPaymentCount = async (req, res) => {
+  try {
+    const count = await Payment.countDocuments();
+    res.status(200).json({ count });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
