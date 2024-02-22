@@ -171,3 +171,21 @@ exports.updateDriverDetails = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.deleteDriver = async (req, res) => {
+  try {
+    const driverId = req.params.id; // Assuming driverId is passed as a parameter in the URL
+
+    // Find the driver by ID and delete it
+    const deletedDriver = await Driver.findByIdAndDelete(driverId);
+
+    // Check if the driver exists
+    if (!deletedDriver) {
+      return res.status(404).json({ error: "Driver not found" });
+    }
+
+    res.status(200).json({ message: "Driver deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -7,13 +7,17 @@ import {
 import { Menu } from "antd";
 
 // Lazy-loaded dummy components
-const Ride = lazy(() => import("../Components/Driver/Location/Bookings"));
+const Ride = lazy(() => import("../Components/Admin/Dashboard/Adminboard"));
 const Unreg = lazy(() => import("../Components/Admin/Dashboard/unreg"));
 const PassDetails = lazy(() =>
   import("../Components/Admin/Dashboard/PassengerManage")
 );
 const DrDetails = lazy(() =>
   import("../Components/Admin/Dashboard/DriverDetails")
+);
+
+const PaymentDetails = lazy(() =>
+  import("../Components/Admin/Dashboard/Payment")
 );
 
 function getItem(label, key, icon, children, type) {
@@ -75,6 +79,7 @@ const App = () => {
         {selectedMenuItem === "2" && <Unreg />}
         {selectedMenuItem === "3" && <PassDetails />}
         {selectedMenuItem === "4" && <DrDetails />}
+        {selectedMenuItem === "5" && <PaymentDetails />}
       </Suspense>
     </>
   );

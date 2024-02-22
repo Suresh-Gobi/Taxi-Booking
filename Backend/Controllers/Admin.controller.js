@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Admin = require('../Models/Admin.model');
+const Driver = require('../Models/Driver.model');
 
 // Controller for admin signup
 exports.signup = async (req, res) => {
@@ -60,3 +61,37 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.getDriverDetails = async (req, res) => {
+  try {
+    const drivers = await Driver.find();
+    res.status(200).json(drivers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateDriverDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedDriver = await Driver.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updatedDriver) {
+      return res.status(404).json({ error: "Driver not found" });
+    }
+    res.status(200).json(updatedDriver);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteDriverDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedDriver = await Driver.findByIdAndDelete(id);
+    if (!deletedDriver) {
+      return res.status(404).json({ error: "Driver not found" });
+    }
+    res.status(200).json({ message: "Driver deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

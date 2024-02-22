@@ -24,3 +24,14 @@ exports.createPayment = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.getAllPayments = async (req, res) => {
+  try {
+    // Fetch all payment records from the database
+    const payments = await Payment.find();
+    res.status(200).json(payments);
+  } catch (error) {
+    // If an error occurs, return a 500 status code and the error message
+    res.status(500).json({ error: error.message });
+  }
+};
