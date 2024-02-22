@@ -1,76 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Spin } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Typography, Card, Button, Spin } from "antd";
+import { CheckCircleOutlined, CarOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
-export default function Pending() {
-  const [pendingBookings, setPendingBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [redirect, setRedirect] = useState(false);
+const { Title, Text } = Typography;
+
+export default function Confirmed() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPendingBookings = async () => {
-      try {
-        // Extract token from local storage
-        const token = localStorage.getItem('token');
-        if (!token) {
-          throw new Error('Token not found in local storage');
-        }
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 10000); // Show loading spinner for 10 seconds
 
-        // Create config object with Authorization header
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-
-        // Make a GET request to the API endpoint with token in headers
-        console.log('Fetching pending bookings...');
-        const response = await axios.get('http://localhost:5000/api/booking/bookingstatus', config);
-
-        // Filter out only the pending bookings
-        const pendingBookingsData = response.data.filter(booking => booking.status === 'pending');
-
-        // Set the pending bookings in state
-        console.log('Pending bookings:', pendingBookingsData);
-        setPendingBookings(pendingBookingsData);
-        setLoading(false);
-
-        // Redirect after 10 seconds
-        setTimeout(() => {
-          console.log('Redirecting to /driver...');
-          setRedirect(true);
-        }, 10000);
-      } catch (error) {
-        console.error('Error fetching pending bookings:', error);
-        setLoading(false);
-      }
-    };
-
-    // Call the fetchPendingBookings function when the component mounts
-    fetchPendingBookings();
+    return () => clearTimeout(timer); // Cleanup timer on component unmount
   }, []);
 
-  useEffect(() => {
-    if (redirect) {
-      console.log('Redirecting...');
-      navigate('/driver');
-    }
-  }, [redirect, navigate]);
+  const handleRateDriverClick = () => {
+    navigate("/user/rate");
+  };
 
   return (
-    <div>
-      <h1>Pending Bookings</h1>
-      <Spin tip="Wait for Driver Acceptance!" spinning={loading} size="large">
-        <ul>
-          {pendingBookings.map(booking => (
-            <li key={booking._id}>
-              <p>Status: {booking.status}</p>
-            </li>
-          ))}
-        </ul>
-      </Spin>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      {loading ? (
+        <Spin size="large" />
+      ) : (
+        <Card
+          style={{
+            width: 400,
+            textAlign: "center",
+            padding: 20,
+            borderRadius: 10,
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <CheckCircleOutlined style={{ fontSize: 50, color: "#52c41a" }} />
+          <Title level={4} style={{ marginTop: 16 }}>
+            Booking Confirmed
+          </Title>
+          <Text type="secondary">
+            Your trip has been confirmed, and the journey has started.
+          </Text>
+          <br />
+          <CarOutlined
+            style={{ fontSize: 40, color: "#1890ff", marginTop: 20 }}
+          />
+          <br />
+          <Button
+            type="primary"
+            style={{ marginTop: 20 }}
+            onClick={handleRateDriverClick}
+          >
+            Pay and Rate
+          </Button>
+        </Card>
+      )}
     </div>
   );
 }

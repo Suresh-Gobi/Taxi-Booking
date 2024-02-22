@@ -22,6 +22,8 @@ import Adminsignup from "./Components/Admin/Dashboard/Signup";
 import AdminLogin from "./Components/Admin/Dashboard/Login";
 import Unreg from "./Components/Admin/Dashboard/unreg";
 import DriverDetails  from "./Components/Admin/Dashboard/DriverDetails";
+import PayPassenger from "./Components/Passenger/Payment";
+import Rate from "./Components/Passenger/Rate";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -49,6 +51,8 @@ function App() {
           <Route path="/adminlogin" element={<AdminLogin />} />
           <Route path="/unreg" element={<Unreg />} />
           <Route path="/driverdet" element={<DriverDetails />} />
+          <Route path="/payhere" element={<PayPassenger />} />
+          <Route path="/rate" element={<Rate />} />
           
         </Routes>
       </BrowserRouter>

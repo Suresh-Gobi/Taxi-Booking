@@ -10,4 +10,7 @@ router.get('/driverdetails', driverController.getDriverDetails);
 router.put('/updatedetails', driverController.updateDriverDetails);
 router.delete('/deletedetails/:id', driverController.deleteDriver);
 
+router.get('/getstatus', driverController.getDriverStatus);
+router.put('/updatestatus/:id', driverController.updateDriverStatus);
+
 module.exports = router;

@@ -189,3 +189,52 @@ exports.deleteDriver = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.updateDriverStatus = async (req, res) => {
+  try {
+    // Extract token from request headers
+    const token = req.headers.authorization.split(' ')[1]; // Assuming the token is sent in the format 'Bearer <token>'
+    
+    // Verify the token to get driver details
+    const decodedToken = jwt.verify(token, 'your_secret_key_here');
+    const driverId = decodedToken.driverId; // Assuming the token contains driverId
+    
+    // Check if driver exists
+    const driver = await Driver.findById(driverId);
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    // Update driver status
+    driver.available = req.body.available; // Assuming the request body contains the updated status
+    await driver.save();
+
+    res.status(200).json({ message: 'Driver status updated successfully' });
+  } catch (error) {
+    console.error('Error updating driver status:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.getDriverStatus = async (req, res) => {
+  try {
+    // Extract token from request headers
+    const token = req.headers.authorization.split(' ')[1]; // Assuming the token is sent in the format 'Bearer <token>'
+    
+    // Verify the token to get driver details
+    const decodedToken = jwt.verify(token, 'your_secret_key_here');
+    const driverId = decodedToken.driverId; // Assuming the token contains driverId
+    
+    // Check if driver exists
+    const driver = await Driver.findById(driverId);
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    // Send driver status as response
+    res.status(200).json({ available: driver.available });
+  } catch (error) {
+    console.error('Error fetching driver status:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
