@@ -37,7 +37,8 @@ export default function Adminboard() {
         setTotalBookingCount(bookingCount);
 
         // Call createChart function with updated counts
-        createChart(passengerCount, driverCount);
+        createChart(totalPassengerCount, totalDriverCount);
+        createChart2(totalBookingCount); // Call createChart2 function
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -81,6 +82,41 @@ export default function Adminboard() {
     });
   };
 
+  // Function to create second Chart.js chart as a pie chart
+  const createChart2 = (totalBookingCount) => {
+    const ctx = document.getElementById('myChart2').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie', // Set the chart type to 'pie' for pie chart
+      data: {
+        labels: ['Passengers', 'Drivers', 'Bookings'], // Labels for the pie chart
+        datasets: [
+          {
+            label: 'Total Registered',
+            data: [totalPassengerCount, totalDriverCount, totalBookingCount], // Add totalBookingCount
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(75, 192, 192, 0.2)', // Add color for Bookings
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(75, 192, 192, 1)', // Add color for Bookings
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-around' }}>
@@ -100,6 +136,11 @@ export default function Adminboard() {
       <Card>
         <div style={{ textAlign: 'center' }}>
           <canvas id="myChart" width="200" height="200"></canvas>
+        </div>
+      </Card>
+      <Card>
+        <div style={{ textAlign: 'center' }}>
+          <canvas id="myChart2" width="200" height="200"></canvas>
         </div>
       </Card>
     </div>
