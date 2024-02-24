@@ -17,56 +17,56 @@ export default function Adminboard() {
         const passengerData = await passengerResponse.json();
         const passengerCount = passengerData.count;
         setTotalPassengerCount(passengerCount);
-
+  
         // Fetch driver count
         const driverResponse = await fetch('http://localhost:5000/api/admin/drivercount');
         const driverData = await driverResponse.json();
         const driverCount = driverData.count;
         setTotalDriverCount(driverCount);
-
+  
         // Fetch payment count
         const paymentResponse = await fetch('http://localhost:5000/api/admin/paymentcount');
         const paymentData = await paymentResponse.json();
         const paymentCount = paymentData.totalCount;
         setTotalPaymentCount(paymentCount);
-
+  
         // Fetch total booking count
         const bookingResponse = await fetch('http://localhost:5000/api/admin/totalbook');
         const bookingData = await bookingResponse.json();
         const bookingCount = bookingData.totalCount;
         setTotalBookingCount(bookingCount);
-
+  
         // Call createChart function with updated counts
-        createChart(totalPassengerCount, totalDriverCount);
-        createChart2(totalBookingCount); // Call createChart2 function
+        createChart(passengerCount, driverCount, bookingCount);
+        createChart2(passengerCount, driverCount, bookingCount); // Call createChart2 function
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     }
-
+  
     fetchData();
-  }, [totalPassengerCount, totalDriverCount, totalPaymentCount, totalBookingCount]); // Update the chart whenever these values change
-
+  }, []); // Run once when the component mounts
+  
   // Function to create Chart.js chart
-  const createChart = (passengerCount, driverCount) => {
+  const createChart = (passengerCount, driverCount, bookingCount) => {
     const ctx = document.getElementById('myChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Passengers', 'Drivers', 'Bookings'], // Add 'Bookings' label
+        labels: ['Passengers', 'Drivers', 'Bookings'],
         datasets: [
           {
             label: 'Total Registered',
-            data: [passengerCount, driverCount, totalBookingCount], // Add totalBookingCount
+            data: [passengerCount, driverCount, bookingCount],
             backgroundColor: [
               'rgba(255, 99, 132, 0.2)',
               'rgba(54, 162, 235, 0.2)',
-              'rgba(75, 192, 192, 0.2)', // Add color for Bookings
+              'rgba(75, 192, 192, 0.2)',
             ],
             borderColor: [
               'rgba(255, 99, 132, 1)',
               'rgba(54, 162, 235, 1)',
-              'rgba(75, 192, 192, 1)', // Add color for Bookings
+              'rgba(75, 192, 192, 1)',
             ],
             borderWidth: 1,
           },
@@ -81,27 +81,27 @@ export default function Adminboard() {
       },
     });
   };
-
+  
   // Function to create second Chart.js chart as a pie chart
-  const createChart2 = (totalBookingCount) => {
+  const createChart2 = (passengerCount, driverCount, bookingCount) => {
     const ctx = document.getElementById('myChart2').getContext('2d');
     new Chart(ctx, {
-      type: 'pie', // Set the chart type to 'pie' for pie chart
+      type: 'line',
       data: {
-        labels: ['Passengers', 'Drivers', 'Bookings'], // Labels for the pie chart
+        labels: ['Passengers', 'Drivers', 'Bookings'],
         datasets: [
           {
             label: 'Total Registered',
-            data: [totalPassengerCount, totalDriverCount, totalBookingCount], // Add totalBookingCount
+            data: [passengerCount, driverCount, bookingCount],
             backgroundColor: [
               'rgba(255, 99, 132, 0.2)',
               'rgba(54, 162, 235, 0.2)',
-              'rgba(75, 192, 192, 0.2)', // Add color for Bookings
+              'rgba(75, 192, 192, 0.2)',
             ],
             borderColor: [
               'rgba(255, 99, 132, 1)',
               'rgba(54, 162, 235, 1)',
-              'rgba(75, 192, 192, 1)', // Add color for Bookings
+              'rgba(75, 192, 192, 1)',
             ],
             borderWidth: 1,
           },
@@ -116,6 +116,7 @@ export default function Adminboard() {
       },
     });
   };
+  
 
   return (
     <div>

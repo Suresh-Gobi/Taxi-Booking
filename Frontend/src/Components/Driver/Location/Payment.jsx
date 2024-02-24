@@ -1,23 +1,34 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import { Typography, Button, Card } from 'antd';
+import axios from 'axios';
 
 const { Title, Text } = Typography;
 
 export default function Payment() {
-  // Use the useLocation hook to access the query parameters
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
   const distance = queryParams.get('distance');
   const price = queryParams.get('price');
   const bookingId = queryParams.get('bookingId');
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
 
-  // Function to handle payment completion
-  const handlePaymentComplete = () => {
-    // Logic to handle payment completion
-    alert('Payment completed successfully!');
-    // Redirect to the "/driver" page after payment completion
-    window.location.href = '/driverdash';
+  const handlePaymentComplete = async () => {
+    try {
+      // Send a POST request to the payment API endpoint
+      const response = await axios.post('http://localhost:5000/api/payment/pay', {
+        distance,
+        price,
+        bookingId
+      });
+      console.log('Payment response:', response.data);
+      // Set payment completion flag to true
+      setPaymentCompleted(true);
+    } catch (error) {
+      console.error('Error completing payment:', error);
+      // Handle payment error
+      // For example, show an error message to the user
+    }
   };
 
   return (
@@ -29,8 +40,18 @@ export default function Payment() {
         <p>{price}</p>
         <Text strong>Booking ID:</Text>
         <p>{bookingId}</p>
-        <Button type="primary" danger onClick={handlePaymentComplete}>
-          Complete Payment
+        {/* Display "Complete Payment" button only if payment is not completed */}
+        {!paymentCompleted && (
+          <Button type="primary" danger onClick={handlePaymentComplete}>
+            Complete Payment
+          </Button>
+        )}
+        {/* Display message if payment is completed */}
+        {paymentCompleted && (
+          <Text type="success">Payment completed successfully!</Text>
+        )}<br/><br/>
+        <Button>
+          <Link to="/driverdash">Go Back to Dashboard</Link>
         </Button>
       </Card>
     </div>

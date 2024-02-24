@@ -21,10 +21,12 @@ import Payment from "./Components/Driver/Location/Payment";
 import Adminsignup from "./Components/Admin/Dashboard/Signup";
 import AdminLogin from "./Components/Admin/Dashboard/Login";
 import Unreg from "./Components/Admin/Dashboard/unreg";
-import DriverDetails  from "./Components/Admin/Dashboard/DriverDetails";
+import DriverDetails from "./Components/Admin/Dashboard/DriverDetails";
 import PayPassenger from "./Components/Passenger/Payment";
 import Rate from "./Components/Passenger/Rate";
-
+import Home from "./Components/Home/home";
+import Food from "./Components/Passenger/Food";
+import UserProfile from "./Components/Passenger/Profile";
 function App() {
   const [count, setCount] = useState(0);
 
@@ -53,7 +55,9 @@ function App() {
           <Route path="/driverdet" element={<DriverDetails />} />
           <Route path="/payhere" element={<PayPassenger />} />
           <Route path="/rate" element={<Rate />} />
-          
+          <Route path="/" element={<Home />} />
+          <Route path="/food" element={<Food />} />
+          <Route path="/userpprofile" element={<UserProfile />} />
         </Routes>
       </BrowserRouter>
     </>

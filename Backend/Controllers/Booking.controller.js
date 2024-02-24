@@ -2,6 +2,7 @@ const Booking = require('../Models/Booking.model');
 const Driver = require('../Models/Driver.model');
 const Passenger = require('../Models/Passenger.model');
 const jwt = require('jsonwebtoken');
+const { BookingConfirm } = require('../Utils/BookingConfirm'); 
 
 const secretKey = 'your_secret_key_here';
 
@@ -108,6 +109,18 @@ exports.acceptBooking = async (req, res) => {
     // Update the driver's availability to false
     const driver = await Driver.findByIdAndUpdate(driverId, { available: false }, { new: true });
 
+    // Send email confirmation
+    const emailData = {
+      passengerName: booking.passenger.username,
+      email: booking.passenger.email,
+      pickupLocation: booking.pickupLocation,
+      dropLocation: booking.dropLocation,
+      pickupTime: booking.pickupTime, // Assuming you have pickupTime field in Booking model
+      driverName: driver.name, // Assuming driver has a name field
+      driverNumberPlate: driver.numberPlate, // Assuming driver has a numberPlate field
+    };
+    BookingConfirm(emailData);
+
     // Respond with success message
     res.status(200).json({ message: 'Booking accepted successfully', booking });
   } catch (error) {
@@ -150,6 +163,9 @@ exports.completeBooking = async (req, res) => {
     booking.status = 'completed';
     await booking.save();
 
+    // Update the driver's availability to true
+    const driver = await Driver.findByIdAndUpdate(driverId, { available: true }, { new: true });
+
     // Respond with success message
     res.status(200).json({ message: 'Booking completed successfully', booking });
   } catch (error) {
@@ -159,6 +175,7 @@ exports.completeBooking = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 exports.showPendingBookings = async (req, res) => {
   try {

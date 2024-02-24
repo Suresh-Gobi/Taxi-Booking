@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Rate, Button, Input, notification, Typography } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -15,7 +15,7 @@ const RateForm = () => {
     try {
       // Assuming you have the backend API URL correct
       const response = await fetch(
-        "http://localhost:5000/api/booking/user/rate",
+        "http://localhost:5000/api/rate/rate",
         {
           method: "POST",
           headers: {
@@ -35,7 +35,7 @@ const RateForm = () => {
 
         form.resetFields();
 
-        navigate("/user/end");
+        navigate("/passengerdash");
       } else {
         notification.error({
           message: "Rating Submission Failed",
@@ -78,8 +78,8 @@ const RateForm = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              Submit Rating
+            <Button htmlType="submit" loading={loading} onClick={handleRateSubmit}>
+              <Link to="/passengerdash">Submit Rating</Link>
             </Button>
           </Form.Item>
         </Form>

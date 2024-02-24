@@ -8,7 +8,7 @@ import {
   DollarOutlined,
   FieldTimeOutlined,
 } from "@ant-design/icons";
-
+import { Link, useNavigate } from "react-router-dom";
 const { Search } = Input;
 
 const socket = io.connect("http://localhost:5000");
@@ -296,7 +296,7 @@ const LocationComponent = () => {
   return (
     <div>
       {/* Logged-in user data */}
-      <Card style={{textAlign: "right"}}>
+      <Card style={{ textAlign: "right" }}>
         {loggedInUserData && (
           <div>
             <p>Username: {loggedInUserData.username}</p>
@@ -433,9 +433,8 @@ const LocationComponent = () => {
               onClick={() => handleBookNow(driver._id)}
               ghost
               loading={loading}
-              to='/pending'
             >
-              Book Now
+              <Link to="/pending"> Book Now</Link>
             </Button>
             <Button
               type="default"

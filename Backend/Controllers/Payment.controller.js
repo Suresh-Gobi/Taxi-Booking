@@ -1,4 +1,4 @@
-const Payment = require('../Models/Payment.model');
+const Payment = require("../Models/Payment.model");
 
 // Controller function to create a payment record
 exports.createPayment = async (req, res) => {
@@ -10,18 +10,18 @@ exports.createPayment = async (req, res) => {
     const payment = new Payment({
       price,
       distance,
-      bookingId
+      bookingId,
     });
 
     // Save the new payment record to the database
     await payment.save();
 
     // Respond with the created payment record
-    res.status(201).json(payment);
+    res.status(201).json({ message: "Payment created successfully", payment });
   } catch (error) {
     // Handle errors
-    console.error('Error creating payment:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error creating payment:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 

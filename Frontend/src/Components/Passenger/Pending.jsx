@@ -18,7 +18,7 @@ export default function Confirmed() {
   }, []);
 
   const handleRateDriverClick = () => {
-    navigate("/user/rate");
+    navigate("/payhere");
   };
 
   return (
@@ -46,19 +46,20 @@ export default function Confirmed() {
           <Title level={4} style={{ marginTop: 16 }}>
             Booking Confirmed
           </Title>
+          <Title level={4} style={{ marginTop: 16 }}>
+            Driver Will be In 15 mins
+          </Title>
           <Text type="secondary">
             Your trip has been confirmed, and the journey has started.
           </Text>
+          <br />
+          <Button style={{ marginTop: 20 }}>Track Driver On Live</Button>
           <br />
           <CarOutlined
             style={{ fontSize: 40, color: "#1890ff", marginTop: 20 }}
           />
           <br />
-          <Button
-            type="primary"
-            style={{ marginTop: 20 }}
-            onClick={handleRateDriverClick}
-          >
+          <Button style={{ marginTop: 20 }} onClick={handleRateDriverClick}>
             Pay and Rate
           </Button>
         </Card>

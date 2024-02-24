@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, Button, Spin, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
@@ -125,7 +125,6 @@ export default function Bookings() {
 
   return (
     <div>
-      <h1>Bookings</h1>
       {bookings.length === 0 && <Spin />}{" "}
       {/* Show spinner if bookings are loading */}
       {bookings.map((booking, index) => (
@@ -144,15 +143,11 @@ export default function Bookings() {
           </p>
           {/* Conditional rendering for accept or complete button */}
           {booking.status === "pending" ? (
-            <Button
-              type="primary"
-              onClick={() => handleAcceptBooking(booking._id, index)}
-            >
+            <Button onClick={() => handleAcceptBooking(booking._id, index)}>
               Accept
             </Button>
           ) : (
             <Button
-              type="primary"
               onClick={() => handleCompleteBooking(booking._id, index)}
               disabled={booking.status === "completed"}
             >
